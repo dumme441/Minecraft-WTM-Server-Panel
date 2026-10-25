@@ -1,0 +1,14 @@
+' WTM panel launcher (silent SSH tunnel + open browser).
+' Copy to WTM.vbs and replace the three placeholders below.
+Option Explicit
+Dim sh, sshExe, keyFile, host
+Set sh = CreateObject("WScript.Shell")
+sshExe  = "C:\Users\YOURNAME\WTM\bin\ssh.exe"
+keyFile = "C:\Users\YOURNAME\.ssh\wtm_panel"
+host    = "root@YOUR_SERVER_IP"
+
+sh.Run """" & sshExe & """ -N -i """ & keyFile & """ -o StrictHostKeyChecking=no" & _
+       " -o ExitOnForwardFailure=yes -o ServerAliveInterval=30" & _
+       " -L 8080:127.0.0.1:8080 " & host, 0, False
+WScript.Sleep 2500
+sh.Run "http://127.0.0.1:8080/", 1, False
