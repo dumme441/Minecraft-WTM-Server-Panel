@@ -1,0 +1,21 @@
+# 构建产物
+build/
+*.class
+
+# 运行时数据（真实存档/日志/密钥，绝不入库）
+data/
+*.log
+*.log.*
+
+# 测试夹具
+smoke/
+
+# 编辑器
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# 发布包
+dist/
+*.zip

@@ -1,0 +1,49 @@
+# WTM 配置示例
+# 说明：注释以 # 开头；列表可以写成 [a, b] 或 - a 的形式。
+
+server:
+  # 启动服务端的命令。请改成你自己机器上的 java 路径（systemd 下建议写绝对路径）
+  command: java
+  args:
+    - -Xms1G
+    - -Xmx3G
+    # Paper 常用参数，可按机器内存调整
+    - -XX:+UseG1GC
+    - -XX:+ParallelRefProcEnabled
+    - -XX:MaxGCPauseMillis=200
+    - -jar
+    - server.jar
+    - nogui
+  # 服务端所在目录（里面应有 server.jar、world/ 等）
+  dir: /srv/mc
+  # wtm 启动时是否自动拉起服务端
+  autostart: true
+  # 等待 "Done (" 的最长时间；大整合包首启可能超过 180s
+  ready_timeout: 180s
+  # 发送 stop 后等待进程退出的时间，超时会降级 SIGTERM / 强杀
+  stop_timeout: 60s
+
+panel:
+  # 默认只监听本机，远程访问请用 SSH 隧道：
+  #   ssh -L 8080:127.0.0.1:8080 user@your-vps
+  # 如果确实要暴露公网，改成 0.0.0.0 并务必先配置防火墙 + HTTPS 反向代理
+  listen: 127.0.0.1
+  port: 8080
+  # 用 `java -jar wtm.jar hash-password` 生成后粘贴到这里
+  password_hash: ""
+
+backup:
+  # wtm 自己的数据目录（快照、日志、密钥都在这里）
+  dir: /opt/wtm/data
+  # 要备份的世界目录名（相对 server.dir）
+  worlds:
+    - world
+    - world_nether
+    - world_the_end
+  # 每天自动备份的时刻（24 小时制）
+  at: "04:00"
+  # 保留策略：最近 N 个 + 每天 1 个（最多 N 天）
+  keep_last: 7
+  keep_daily: 5
+  # 自动备份时若有玩家在线，最多等待多少分钟空服；超时则跳过本次
+  wait_idle_minutes: 30

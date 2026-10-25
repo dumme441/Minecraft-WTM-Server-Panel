@@ -1,0 +1,36 @@
+[Unit]
+Description=WTM Minecraft save guardian (panel + supervisor)
+Documentation=https://github.com/yourname/wtm
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# 建议用独立的非 root 用户跑（与 Minecraft 服务端同一个用户）
+User=mc
+Group=mc
+WorkingDirectory=/srv/mc
+
+# 轻量参数：RSS 约 50MB；TieredStopAtLevel=1 对 IO 型进程足够
+ExecStart=/usr/bin/java \
+    -Xmx64m -XX:MaxMetaspaceSize=96m \
+    -XX:+UseSerialGC -XX:TieredStopAtLevel=1 -Xss512k \
+    -Dfile.encoding=UTF-8 \
+    -jar /opt/wtm/wtm.jar run /opt/wtm/config.yaml
+
+Restart=always
+RestartSec=3
+# wtm 会优雅 stop 子进程；给它足够时间，别让 systemd 先杀
+KillMode=mixed
+TimeoutStopSec=90
+LimitNOFILE=65535
+
+# 加固：只允许写数据目录与服务端目录
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/srv/mc /opt/wtm/data
+
+[Install]
+WantedBy=multi-user.target
